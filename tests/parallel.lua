@@ -1,0 +1,33 @@
+local plugin = require('73')
+local calls = {}
+plugin.register_adapter('parallel_fixture', { capabilities = { edit = true }, request = function(req, cb)
+  calls[#calls + 1] = { req = req, cb = cb }
+end })
+plugin.setup({ harness = 'parallel_fixture', parallel = true, auto_apply = true })
+local buf = vim.api.nvim_create_buf(true, false)
+vim.api.nvim_set_current_buf(buf)
+vim.api.nvim_buf_set_lines(buf, 0, -1, true, { 'aaa bbb ccc' })
+local function edit(a,b)
+ return plugin.edit('replace', { range = { start = {0,a}, ['end'] = {0,b} } })
+end
+local function reply(i,text)
+ local call = calls[i]; local d=call.req.document
+ call.cb({id=call.req.id,uri=d.uri,revision=d.revision,content_hash=d.content_hash,range=d.range,replacement=text})
+ vim.wait(20,function() return false end)
+end
+local first, second = edit(0,3), edit(4,7)
+reply(1,'longer')
+assert(first.status() == 'accepted' and second.status() == 'pending')
+reply(2,'B')
+assert(second.status() == 'accepted')
+assert(vim.api.nvim_buf_get_lines(buf,0,1,true)[1] == 'longer B ccc')
+vim.cmd('undo'); assert(vim.api.nvim_buf_get_lines(buf,0,1,true)[1] == 'longer bbb ccc')
+vim.cmd('undo'); assert(vim.api.nvim_buf_get_lines(buf,0,1,true)[1] == 'aaa bbb ccc')
+first,second = edit(0,3),edit(1,3)
+reply(3,'X')
+assert(second.status() == 'cancelled')
+reply(4,'bad')
+assert(vim.api.nvim_buf_get_lines(buf,0,1,true)[1] == 'X bbb ccc')
+assert(plugin.cancel_all() == 0)
+plugin.setup({})
+print('73 parallel edit checks passed')

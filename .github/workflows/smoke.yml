@@ -1,0 +1,32 @@
+name: Neovim smoke tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: ${{ matrix.os }} / Neovim ${{ matrix.neovim }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    env:
+      NVIM_LOG_FILE: ${{ runner.temp }}/73-nvim.log
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        neovim: [v0.10.0, stable]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ matrix.neovim }}
+      - name: Report editor version
+        run: nvim --version
+      - name: Run offline editor checks
+        run: nvim --headless -u NONE -i NONE -l tests/smoke.lua

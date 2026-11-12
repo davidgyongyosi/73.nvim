@@ -1,0 +1,82 @@
+*73.txt*  Editor-owned AI assistance with interchangeable harnesses
+
+73 implements local Ask/Edit/Insert workflows. An experimental Pi 1.5.0 adapter is available; live inference is unverified.
+
+WORKFLOW
+    setup({ harness = 'pi', parallel = true, auto_apply = false })
+    parallel permits non-overlapping selection requests to run together.
+    Auto apply is opt-in and still validates snapshots and creates undo steps.
+    :SeventyThreeAutoApply toggles automatic acceptance for future requests.
+    :SeventyThreeCancelAll stops all requests. Working indicators animate.
+
+COMMANDS                                                        *73-commands*
+    :SeventyThreeInfo    Show phase, adapters, and configuration.
+                                                        *:SeventyThreeInfo*
+    :SeventyThreeAsk [instruction]                       *:SeventyThreeAsk*
+        Ask about the cursor, or an explicit Ex range of whole lines.
+    :SeventyThreeEdit [instruction]                      *:SeventyThreeEdit*
+        Replace the current whole line, or an explicit Ex range of lines.
+    :SeventyThreeInsert [instruction]                    *:SeventyThreeInsert*
+        Insert at the captured cursor. Does not accept an Ex range.
+    Omit instruction to open a prompt. Ex ranges always select whole lines;
+    use Lua visual mappings for characterwise selections. Whole-line edits
+    preserve the following source line even without a replacement's final LF.
+    An empty linewise replacement deletes the selected lines.
+    :checkhealth 73      Check callbacks and executable availability, without provider calls.
+
+                                                     *:SeventyThreeStatus*
+    :SeventyThreeStatus  Show the source buffer's latest request state/error.
+                                                     *:SeventyThreeCancel*
+    :SeventyThreeCancel  Cancel its active request (also works from preview).
+                                                       *:SeventyThreeShow*
+    :SeventyThreeShow    Open its ready result from the source in normal mode.
+    Pending requests show virtual text; failure notifications appear once.
+    Unloading the source buffer cancels pending work. Status is removed on wipe.
+
+LUA API                                                     *73.setup*
+    require('73').setup({})
+
+    register_adapter(name, descriptor) registers metadata and an optional local
+    request(request, respond) callback for supported operations.
+    setup({ harness = name }) selects a registered descriptor. A harness
+    needs capabilities.ask, edit, or insert = true. No mappings are installed.
+
+    edit(instruction, opts) captures the active visual selection, or opts.range
+    as zero-based UTF-8 byte positions with exclusive ends. Returns a request
+    handle with status(), cancel(), reject(), and accept(). No source changes
+    occur before acceptance. Stale snapshots cannot be accepted.
+
+    The preview uses a to accept, q or Escape to reject. Closing it rejects the
+    proposal. Acceptance creates one undoable change and never saves the file.
+    request_status() returns a copy of the current buffer's latest request
+    metadata, or nil. cancel() cancels its active request and returns a boolean.
+    Both resolve a preview back to its source buffer.
+    show() opens a ready result; the returned request handle also has show().
+    Background results wait without taking focus. A result auto-opens only for
+    the newest request at its original window/buffer/cursor in normal mode.
+    Deferred results are rechecked for staleness when shown. Acceptance is
+    allowed only after opening the preview.
+
+    ask(instruction, opts) asks about a visual selection or the cursor. Answers
+    have no accept action; q or Escape closes them. The handle supports close().
+    insert(instruction, opts) proposes text immediately before the cursor
+    character, with the same preview and undo guarantees as edit().
+    Omit instruction to open a prompt. The source snapshot and range are
+    captured before prompting; empty input cancels. Source changes invalidate
+    pending prompts. No default mappings are added.
+
+    For offline development use: require('73.adapters.fake').new(replacement).
+    It always proposes the supplied text, without interpreting instructions.
+
+    require('73.adapters.pi').new(opts) creates the experimental Pi adapter.
+    Register it with register_adapter(), then select it via setup(). Unix only;
+    requires Pi 1.5.0. Options: executable, model, provider, timeout_ms (120000),
+    shutdown_ms (500), max_output_bytes (4194304). Provider requires model.
+    It disables tools/extensions/MCP and session persistence, checks the version,
+    and sends unsaved text over stdin. This is not an OS sandbox. Tests use fake
+    processes; no live inference is claimed. Existing Pi authentication is used
+    only when a request starts. See README for configuration and limitations.
+
+See README.md and docs/ for product scope and the draft adapter contract.
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

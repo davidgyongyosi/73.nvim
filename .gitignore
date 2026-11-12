@@ -1,0 +1,10 @@
+.DS_Store
+*.log
+.luarc.local.json
+.local/
+.repro/
+doc/tags
+
+# Local experiments and harness request artifacts
+/tmp/
+/random.py
