@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.0-alpha.2
+
+Fix hosted workflow context evaluation before the first published GitHub prerelease. The initial alpha.1 tag is retained.
+
 ## v0.1.0-alpha.1
 
 First experimental release: Ask, selection edits, cursor insertions, unified-diff previews, undo, cancellation, animated progress, parallel non-overlapping edits, optional auto-apply, and runtime provider selection. Includes experimental Claude Code and Pi 1.5.0 adapters. Completion is outside the plugin scope.

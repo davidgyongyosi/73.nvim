@@ -13,8 +13,6 @@ jobs:
     name: ${{ matrix.os }} / Neovim ${{ matrix.neovim }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
-    env:
-      NVIM_LOG_FILE: ${{ runner.temp }}/73-nvim.log
     strategy:
       fail-fast: false
       matrix:
@@ -29,4 +27,6 @@ jobs:
       - name: Report editor version
         run: nvim --version
       - name: Run offline editor checks
+        env:
+          NVIM_LOG_FILE: ${{ runner.temp }}/73-nvim.log
         run: nvim --headless -u NONE -i NONE -l tests/smoke.lua

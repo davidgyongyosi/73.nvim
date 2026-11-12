@@ -6,7 +6,7 @@ AI assistance at the cursor. Keep your hands on the code.
 
 ## Current status
 
-**v0.1.0-alpha.1 — Ask/Edit/Insert with experimental Claude Code and Pi adapters.** 73 owns unsaved-buffer snapshots, bounded proposals, unified-diff previews, explicit acceptance, cancellation, and undo. A fake adapter supports offline development. The Claude Code adapter defaults to Sonnet with tools disabled; Pi supports its inspected 1.5.0 profile. Automated tests use fake transports; live-provider validation remains pending.
+**v0.1.0-alpha.2 — Ask/Edit/Insert with experimental Claude Code and Pi adapters.** 73 owns unsaved-buffer snapshots, bounded proposals, unified-diff previews, explicit acceptance, cancellation, and undo. A fake adapter supports offline development. The Claude Code adapter defaults to Sonnet with tools disabled; Pi supports its inspected 1.5.0 profile. Automated tests use fake transports; live-provider validation remains pending.
 
 Code completion is outside 73's scope. Use a dedicated Neovim completion plugin alongside it; 73 installs no insert-mode completion hooks or mappings.
 
@@ -20,7 +20,7 @@ Requires Neovim 0.10+ and an authenticated Claude Code CLI on PATH for this exam
 -- lazy.nvim
 {
   'davidgyongyosi/73.nvim',
-  tag = 'v0.1.0-alpha.1',
+  tag = 'v0.1.0-alpha.2',
   config = function()
     local ai = require('73')
     ai.register_adapter('claude', require('73.adapters.claude').new({ model = 'sonnet' }))
