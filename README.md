@@ -39,7 +39,7 @@ Report problems through [GitHub issues](https://github.com/davidgyongyosi/73.nvi
 
 ## Local development
 
-Neovim 0.10+; the full smoke suite passes locally on 0.10.0 and 0.12.6 (macOS arm64). A Linux/macOS CI matrix for 0.10.0 and stable is configured, but hosted runs have not occurred yet. No third-party Lua dependencies.
+Neovim 0.10+; the full smoke suite passes locally on 0.10.0 and 0.12.6 (macOS arm64). A Linux/macOS CI matrix checks 0.10.0 and stable; see [GitHub Actions](https://github.com/davidgyongyosi/73.nvim/actions) for current hosted results. No third-party Lua dependencies.
 
 ```lua
 -- lazy.nvim local development entry
